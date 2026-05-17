@@ -1,0 +1,210 @@
+{
+  "main": {
+    "id": "828599f5b1d141c0",
+    "type": "split",
+    "children": [
+      {
+        "id": "334bd4571abeacfc",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0751b6aa7dd29a68",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Xem biểu đồ"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "21433a7abf6614a4",
+    "type": "split",
+    "children": [
+      {
+        "id": "ff77f0d5a1fac662",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "99fefea90d7afd9e",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Trình duyệt tệp"
+            }
+          },
+          {
+            "id": "17eaaac421041c66",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Tìm kiếm"
+            }
+          },
+          {
+            "id": "24b2f2b731695e6c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Đánh dấu"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "681e27d4c87b7331",
+    "type": "split",
+    "children": [
+      {
+        "id": "7dc15ab9953824e5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4dc4876e878b30f8",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Liên kết đến"
+            }
+          },
+          {
+            "id": "58d681347129fd50",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "BackLog/Sprint1/Quản lý chi nhánh/US2.2-Sửa thông tin chi nhánh.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Liên kết đi ra từ US2.2-Sửa thông tin chi nhánh"
+            }
+          },
+          {
+            "id": "e387e9f51323fab2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Thẻ"
+            }
+          },
+          {
+            "id": "b20bc6ebcbac713a",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Tất cả thuộc tính"
+            }
+          },
+          {
+            "id": "82d2cb264706d3c5",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "BackLog/Sprint1/Quản lý chi nhánh/US2.2-Sửa thông tin chi nhánh.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Đề cương của US2.2-Sửa thông tin chi nhánh"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Mở bộ chuyển đổi nhanh": false,
+      "graph:Mở xem biểu đồ": false,
+      "canvas:Tạo bảng mới": false,
+      "daily-notes:Mở ghi chú hôm nay": false,
+      "templates:Chèn mẫu": false,
+      "command-palette:Mở khay lệnh": false,
+      "bases:Tạo cơ sở mới": false
+    }
+  },
+  "active": "0751b6aa7dd29a68",
+  "lastOpenFiles": [
+    "BackLog/Sprint2/US6.1-Thiết lập sơ đồ bàn.md",
+    "BackLog/Sprint2/US5.1-Tùy chỉnh giá bán và trạng thái món.md",
+    "srs/SRS.md",
+    "Yeu_cau_he_thong.md",
+    "srs/Yeu_cau_he_thong.md",
+    "UI,UX/Thiet_ke_giao_dien.md",
+    "BackLog/Sprint1/US1.2-Đăng xuất.md",
+    "BackLog/Sprint1/US1.1-Đăng nhập.md",
+    "BackLog/Sprint1/US3.2-Quản lý món ăn gốc.md",
+    "BackLog/Sprint1/US3.1-Quản lý danh mục.md",
+    "BackLog/Sprint1/US2.1-Quản lý chi nhánh.md",
+    "BackLog/Sprint3/Quản lý bán hàng/US7.6-Nghiệp vụ Bếp (Kitchen Display System).md",
+    "US_Example.md",
+    "BackLog/Sprint2/Quản lý nhân sự/US4.1-Quản lý nhân sự.md",
+    "BackLog/Sprint1/Quản lý thực đơn gốc/US3.2-Quản lý món ăn gốc.md",
+    "BackLog/Sprint1/Quản lý thực đơn gốc/US3.1-Quản lý danh mục.md",
+    "BackLog/Sprint1/Xác thực và phân quyền/US1.2-Đăng xuất.md",
+    "BackLog/Sprint1/Xác thực và phân quyền/US1.1-Đăng nhập.md",
+    "BackLog/Sprint2/Quản lý nhân sự/US3.1-Quản lý nhân sự.md",
+    "BackLog/Sprint3/Quản lý bán hàng/US7.1-Nghiệp vụ Bán hàng (POS).md",
+    "BackLog/Sprint4/Báo cáo thống kê/US8.1-Báo cáo doanh thu chi nhánh.md",
+    "Chưa đặt tên.canvas",
+    "BackLog/Sprint1/Quản lý thực đơn gốc/US4.2-Quản lý món ăn gốc.md",
+    "BackLog/Sprint1/Quản lý chi nhánh/US2.1-Quản lý chi nhánh.md",
+    "BackLog/Sprint1/Quản lý thực đơn gốc/US4.1-Quản lý danh mục.md",
+    "BackLog/Sprint1/Quản lý chi nhánh/US2.3-Xóa mềm chi nhánh.md",
+    "BackLog/Sprint1/Quản lý chi nhánh/US2.2-Sửa thông tin chi nhánh.md"
+  ]
+}
