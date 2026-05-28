@@ -29,6 +29,7 @@ export default function POSPage() {
 
   const [selectedMenu, setSelectedMenu] = useState<BranchMenu | null>(null);
   const [qtyValue, setQtyValue] = useState(1);
+  const [itemNote, setItemNote] = useState('');
   const [cashReceived, setCashReceived] = useState(0);
   
   const [showOpenTable, setShowOpenTable] = useState(false);
@@ -104,13 +105,19 @@ export default function POSPage() {
     }
     setSelectedMenu(menu);
     setQtyValue(1);
+    setItemNote('');
     setShowQtyModal(true);
   };
 
   const handleAddItem = async () => {
     if (!currentOrder || !selectedMenu) return;
     try {
-      const res = await orderService.addItem(currentOrder.id, selectedMenu.productId, qtyValue);
+      const res = await orderService.addItem(
+        currentOrder.id, 
+        selectedMenu.productId, 
+        qtyValue, 
+        itemNote.trim() || undefined
+      );
       setCurrentOrder(res.data);
       setShowQtyModal(false);
       success(`Đã thêm ${qtyValue} ${selectedMenu.productName}`);
@@ -171,7 +178,11 @@ export default function POSPage() {
           <div className="flex gap-2">
             <button 
               className={`px-6 py-2.5 rounded-lg font-bold text-sm transition-colors ${activeTab === 'TABLES' ? 'bg-[#f97316] text-white shadow-md' : 'btn-ghost'}`}
-              onClick={() => setActiveTab('TABLES')}
+              onClick={() => {
+                setActiveTab('TABLES');
+                setSelectedTable(null);
+                setCurrentOrder(null);
+              }}
             >
               <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[20px]">grid_view</span>Sơ đồ bàn</span>
             </button>
@@ -190,8 +201,8 @@ export default function POSPage() {
             </div>
             <button 
               onClick={() => {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('auth_user');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 window.location.href = '/login';
               }}
               className="btn-ghost !text-red-600 hover:!bg-red-50 !border-red-200"
@@ -234,12 +245,14 @@ export default function POSPage() {
           )}
 
           {activeTab === 'MENU' && (
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col">
               {/* Category Filter */}
-              <div className="flex gap-2 overflow-x-auto pb-6 scrollbar-hide">
+              <div className="flex gap-2 overflow-x-auto pb-6 scrollbar-hide flex-shrink-0">
                 <button 
-                  className={`px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors border
-                    ${catFilter === '' ? 'bg-[#f97316] text-white border-[#f97316] shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+                  className={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 border cursor-pointer active:scale-95
+                    ${catFilter === '' 
+                      ? 'bg-[#f97316] text-white border-[#f97316] shadow-md shadow-orange-500/20' 
+                      : 'bg-white text-gray-700 border-gray-200 hover:bg-orange-50 hover:text-[#f97316] hover:border-[#f97316]/30'}`}
                   onClick={() => setCatFilter('')}
                 >
                   Tất cả
@@ -247,8 +260,10 @@ export default function POSPage() {
                 {categories.map(c => (
                   <button 
                     key={c.id}
-                    className={`px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors border
-                      ${catFilter === c.id.toString() ? 'bg-[#f97316] text-white border-[#f97316] shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+                    className={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 border cursor-pointer active:scale-95
+                      ${catFilter === c.id.toString() 
+                        ? 'bg-[#f97316] text-white border-[#f97316] shadow-md shadow-orange-500/20' 
+                        : 'bg-white text-gray-700 border-gray-200 hover:bg-orange-50 hover:text-[#f97316] hover:border-[#f97316]/30'}`}
                     onClick={() => setCatFilter(c.id.toString())}
                   >
                     {c.name}
@@ -311,7 +326,31 @@ export default function POSPage() {
             currentOrder.items.map(item => (
               <div key={item.id} className="bg-white border rounded-xl p-3 shadow-sm" style={{ borderColor: 'var(--color-border)' }}>
                 <div className="flex justify-between items-start mb-2 gap-2">
-                  <span className="font-bold text-sm text-gray-800 line-clamp-2">{item.productName}</span>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-sm text-gray-800 line-clamp-2">{item.productName}</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {item.note && (
+                        <span className="text-[10px] text-purple-700 bg-purple-50 border border-purple-100 px-2 py-0.5 rounded-md font-semibold flex items-center gap-0.5">
+                          <span className="material-symbols-outlined text-[12px]">sticky_note_2</span> {item.note}
+                        </span>
+                      )}
+                      <span className={`text-[10px] px-2 py-0.5 rounded-md font-semibold flex items-center gap-0.5 border
+                        ${item.status === 'PENDING' ? 'text-gray-600 bg-gray-50 border-gray-200' : 
+                          item.status === 'COOKING' ? 'text-blue-700 bg-blue-50 border-blue-200' :
+                          item.status === 'READY' ? 'text-green-700 bg-green-50 border-green-200' :
+                          'text-gray-600 bg-gray-50 border-gray-200'}
+                      `}>
+                        <span className="material-symbols-outlined text-[12px]">
+                          {item.status === 'PENDING' ? 'hourglass_empty' : 
+                           item.status === 'COOKING' ? 'skillet' :
+                           item.status === 'READY' ? 'check_circle' : 'info'}
+                        </span>
+                        {item.status === 'PENDING' ? 'Chờ chế biến' : 
+                         item.status === 'COOKING' ? 'Đang nấu' :
+                         item.status === 'READY' ? 'Đã xong' : item.status}
+                      </span>
+                    </div>
+                  </div>
                   <span className="font-bold text-[#f97316] shrink-0">{formatCurrency(item.price * item.quantity)}</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -389,7 +428,7 @@ export default function POSPage() {
                 <p className="text-[#f97316] font-bold">{formatCurrency(selectedMenu.localPrice)}</p>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-6 mb-8">
+            <div className="flex items-center justify-center gap-6 mb-6">
               <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100" onClick={() => setQtyValue(Math.max(1, qtyValue - 1))}>
                 <span className="material-symbols-outlined">remove</span>
               </button>
@@ -398,6 +437,22 @@ export default function POSPage() {
                 <span className="material-symbols-outlined">add</span>
               </button>
             </div>
+            
+            {/* Ghi chú món ăn */}
+            <div className="mb-6">
+              <label className="label text-xs font-semibold text-gray-500 mb-1.5 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">edit_note</span>
+                Ghi chú chế biến:
+              </label>
+              <input 
+                type="text" 
+                className="input w-full" 
+                placeholder="Ví dụ: không cay, ít ngọt, mặn, nhạt..."
+                value={itemNote}
+                onChange={(e) => setItemNote(e.target.value)}
+              />
+            </div>
+            
             <div className="flex gap-3">
               <button className="btn-ghost flex-1" onClick={() => setShowQtyModal(false)}>Hủy</button>
               <button className="btn-primary flex-1" onClick={handleAddItem}>Thêm vào hóa đơn</button>

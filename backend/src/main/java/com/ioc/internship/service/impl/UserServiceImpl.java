@@ -4,6 +4,7 @@ import com.ioc.internship.entity.UserEntity;
 import com.ioc.internship.repository.UserRepository;
 import com.ioc.internship.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserEntity> getAllUsers(String search, String role, Long branchId) {
@@ -33,6 +35,7 @@ public class UserServiceImpl implements UserService {
         if (user.getStatus() == null) {
             user.setStatus("ACTIVE");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -49,7 +52,7 @@ public class UserServiceImpl implements UserService {
         existing.setRole(user.getRole());
         existing.setBranch_id(user.getBranch_id());
         if (user.getPassword() != null && !user.getPassword().isBlank()) {
-            existing.setPassword(user.getPassword());
+            existing.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         return userRepository.save(existing);
     }

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
 import { ROUTES } from '../../constants';
 
 interface FormState { username: string; password: string; }
@@ -8,10 +9,20 @@ interface FormErrors { username?: string; password?: string; general?: string; }
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { user, isLoggedIn } = useAuth();
   const [form, setForm]       = useState<FormState>({ username: '', password: '' });
   const [errors, setErrors]   = useState<FormErrors>({});
   const [showPw, setShowPw]   = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      if (user.role === 'BOSS')         navigate(ROUTES.DASHBOARD);
+      else if (user.role === 'MANAGER')  navigate(ROUTES.DASHBOARD);
+      else if (user.role === 'CHEF')     navigate(ROUTES.KDS);
+      else navigate(ROUTES.POS);
+    }
+  }, [isLoggedIn, user, navigate]);
 
   const validate = (): boolean => {
     const errs: FormErrors = {};
@@ -55,36 +66,38 @@ export default function LoginPage() {
     <div className="min-h-screen flex" style={{ background: 'var(--color-bg)' }}>
       {/* ── Left Panel ── */}
       <div
-        className="hidden lg:flex lg:w-[55%] flex-col items-center justify-center p-12 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 50%, #FED7AA 100%)' }}
+        className="hidden lg:flex lg:w-[55%] flex-col items-center justify-center p-12 relative overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: 'url("/images/login_bg.png")' }}
       >
-        {/* Decorative circles */}
-        <div className="absolute top-[-80px] right-[-80px] w-64 h-64 rounded-full opacity-20"
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-black/55 backdrop-blur-[2px]" />
+
+        {/* Glowing decorative circles */}
+        <div className="absolute top-[-80px] right-[-80px] w-96 h-96 rounded-full opacity-20 blur-3xl"
           style={{ background: 'var(--color-primary)' }} />
-        <div className="absolute bottom-[-40px] left-[-40px] w-48 h-48 rounded-full opacity-10"
+        <div className="absolute bottom-[-40px] left-[-40px] w-80 h-80 rounded-full opacity-15 blur-2xl"
           style={{ background: 'var(--color-primary)' }} />
 
-        <div className="relative z-10 text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6 shadow-lg"
-            style={{ background: 'var(--color-primary)' }}>
+        <div className="relative z-10 text-center max-w-lg">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6 shadow-2xl backdrop-blur-md bg-white/10 border border-white/20">
             <span className="material-symbols-outlined text-white text-4xl">restaurant</span>
           </div>
-          <h1 className="text-5xl font-extrabold mb-3" style={{ color: 'var(--color-text-primary)' }}>ProPOS</h1>
-          <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>
-            Hệ thống Quản lý Chuỗi Nhà hàng
+          <h1 className="text-5xl font-black mb-3 text-white tracking-tight drop-shadow-sm">ProPOS</h1>
+          <p className="text-lg text-orange-100 font-medium drop-shadow-sm">
+            Hệ thống Quản lý Chuỗi Nhà hàng Chuyên nghiệp
           </p>
 
-          <div className="mt-12 grid grid-cols-3 gap-4 text-center">
+          <div className="mt-16 grid grid-cols-3 gap-5 text-center">
             {[
               { icon: 'storefront',      label: 'Quản lý Chi nhánh' },
               { icon: 'restaurant_menu', label: 'Thực đơn thông minh' },
               { icon: 'point_of_sale',   label: 'POS Nhanh chóng' },
             ].map((f) => (
-              <div key={f.label} className="bg-white/60 rounded-xl p-4 backdrop-blur">
-                <span className="material-symbols-outlined text-3xl" style={{ color: 'var(--color-primary)' }}>
+              <div key={f.label} className="bg-white/10 rounded-2xl p-4 backdrop-blur-lg border border-white/10 hover:bg-white/15 transition-all duration-300">
+                <span className="material-symbols-outlined text-3xl text-orange-300">
                   {f.icon}
                 </span>
-                <p className="text-xs mt-2 font-medium" style={{ color: 'var(--color-text-secondary)' }}>{f.label}</p>
+                <p className="text-xs mt-2 font-semibold text-white">{f.label}</p>
               </div>
             ))}
           </div>
@@ -177,14 +190,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Role routing note */}
-          <div className="mt-8 p-3 rounded-xl text-xs space-y-1" style={{ background: 'var(--color-bg)', color: 'var(--color-text-secondary)' }}>
-            <p className="font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>Điều hướng sau đăng nhập:</p>
-            <p><span className="font-medium">Boss</span> → Trang Admin</p>
-            <p><span className="font-medium">Quản lý</span> → Dashboard chi nhánh</p>
-            <p><span className="font-medium">Nhân viên</span> → Màn hình POS</p>
-            <p><span className="font-medium">Đầu bếp</span> → Màn hình Bếp (KDS)</p>
-          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,3 @@
--- =============================================
--- DATABASE SETUP & RESET SCRIPT FOR PROPOS SYSTEM
--- =============================================
 
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'propos_db')
 BEGIN
@@ -232,40 +229,40 @@ GO
 -- 4. Chèn 30 món ăn gốc
 INSERT INTO products (category_id, name, base_price, image_url) VALUES 
 -- Món chính (Category 1: 10 Món)
-(1, N'Bò Né Sốt Tiêu Đen', 125000, NULL),
-(1, N'Gà Quay Nướng Lu Sốt Mật Ong', 185000, NULL),
-(1, N'Sườn Heo Nướng BBQ', 165000, NULL),
-(1, N'Tôm Hùm Đút Lò Phô Mai', 550000, NULL),
-(1, N'Cá Chẽm Chiên Sốt Chanh Dây', 220000, NULL),
-(1, N'Mì Ý Hải Sản Sốt Cà Chua', 115000, NULL),
-(1, N'Lẩu Thái Hải Sản', 290000, NULL),
-(1, N'Cơm Chiên Hải Sản Hoàng Kim', 135000, NULL),
-(1, N'Vịt Quay Bắc Kinh', 380000, NULL),
-(1, N'Bò Kho Đi Kèm Bánh Mì', 95000, NULL),
+(1, N'Bò Né Sốt Tiêu Đen', 125000, '/images/anh1_1.jpg'),
+(1, N'Gà Quay Nướng Lu Sốt Mật Ong', 185000, '/images/anh1_2.jpg'),
+(1, N'Sườn Heo Nướng BBQ', 165000, '/images/anh1_3.jpg'),
+(1, N'Tôm Hùm Đút Lò Phô Mai', 550000, '/images/anh1_4.jpg'),
+(1, N'Cá Chẽm Chiên Sốt Chanh Dây', 220000, '/images/anh1_5.jpg'),
+(1, N'Mì Ý Hải Sản Sốt Cà Chua', 115000, '/images/anh1_6.jpg'),
+(1, N'Lẩu Thái Hải Sản', 290000, '/images/anh1_7.jpg'),
+(1, N'Cơm Chiên Hải Sản Hoàng Kim', 135000, '/images/anh1_8.jpg'),
+(1, N'Vịt Quay Bắc Kinh', 380000, '/images/anh1_9.jpg'),
+(1, N'Bò Kho Đi Kèm Bánh Mì', 95000, '/images/anh1_10.jpg'),
 
 -- Đồ uống (Category 2: 10 Món)
-(2, N'Trà Trái Cây Nhiệt Đới', 45000, NULL),
-(2, N'Nước Ép Thơm Mint (Dứa & Bạc Hà)', 38000, NULL),
-(2, N'Sinh Tố Bơ Dừa', 55000, NULL),
-(2, N'Trà Sữa Trân Châu Hoàng Kim', 42000, NULL),
-(2, N'Matcha Latte', 48000, NULL),
-(2, N'Mojito Chanh Dây Bạc Hà', 40000, NULL),
-(2, N'Cà Phê Muối', 35000, NULL),
-(2, N'Nước Ép Lựu Đỏ Nguyên Chất', 48000, NULL),
-(2, N'Soda Việt Quất', 38000, NULL),
-(2, N'Trà Hoa Cúc Mật Ong', 35000, NULL),
+(2, N'Trà Trái Cây Nhiệt Đới', 45000, '/images/anh2_1.jpg'),
+(2, N'Nước Ép Thơm Mint (Dứa & Bạc Hà)', 38000, '/images/anh2_2.jpg'),
+(2, N'Sinh Tố Bơ Dừa', 55000, '/images/anh2_3.jpg'),
+(2, N'Trà Sữa Trân Châu Hoàng Kim', 42000, '/images/anh2_4.jpg'),
+(2, N'Matcha Latte', 48000, '/images/anh2_5.jpg'),
+(2, N'Mojito Chanh Dây Bạc Hà', 40000, '/images/anh2_6.jpg'),
+(2, N'Cà Phê Muối', 35000, '/images/anh2_7.jpg'),
+(2, N'Nước Ép Lựu Đỏ Nguyên Chất', 48000, '/images/anh2_8.jpg'),
+(2, N'Soda Việt Quất', 38000, '/images/anh2_9.jpg'),
+(2, N'Trà Hoa Cúc Mật Ong', 35000, '/images/anh2_10.jpg'),
 
 -- Tráng miệng (Category 3: 10 Món)
-(3, N'Bánh Tiramisu', 48000, NULL),
-(3, N'Panna Cotta Sốt Dâu', 35000, NULL),
-(3, N'Chè Khúc Bạch', 38000, NULL),
-(3, N'Bánh Creme Brulee', 45000, NULL),
-(3, N'Kem Dừa Côn Đảo', 45000, NULL),
-(3, N'Bánh Flan Trân Châu Ca Cao', 32000, NULL),
-(3, N'Rau Câu Trái Cây 3 Lớp', 28000, NULL),
-(3, N'Bánh Mousse Xoài', 42000, NULL),
-(3, N'Chè Sương Sa Hạt Lựu', 35000, NULL),
-(3, N'Trái Cây Đĩa Theo Mùa', 60000, NULL);
+(3, N'Bánh Tiramisu', 48000, '/images/anh3_1.jpg'),
+(3, N'Panna Cotta Sốt Dâu', 35000, '/images/anh3_2.jpg'),
+(3, N'Chè Khúc Bạch', 38000, '/images/anh3_3.jpg'),
+(3, N'Bánh Creme Brulee', 45000, '/images/anh3_4.jpg'),
+(3, N'Kem Dừa Côn Đảo', 45000, '/images/anh3_5.jpg'),
+(3, N'Bánh Flan Trân Châu Ca Cao', 32000, '/images/anh3_6.jpg'),
+(3, N'Rau Câu Trái Cây 3 Lớp', 28000, '/images/anh3_7.jpg'),
+(3, N'Bánh Mousse Xoài', 42000, '/images/anh3_8.jpg'),
+(3, N'Chè Sương Sa Hạt Lựu', 35000, '/images/anh3_9.jpg'),
+(3, N'Trái Cây Đĩa Theo Mùa', 60000, '/images/anh3_10.jpg');
 GO
 
 -- 5. Chèn Thực đơn cho cả 10 chi nhánh (bán đủ 30 món, is_available = 1)

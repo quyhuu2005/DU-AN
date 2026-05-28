@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -190,8 +191,13 @@ public class OrderServiceImpl implements OrderService {
         String tableName = tableRepository.findById(entity.getTableId()).map(DiningTableEntity::getName).orElse("");
         String staffName = userRepository.findById(entity.getStaffId()).map(UserEntity::getFullName).orElse("");
         
-        List<OrderItemDTO> itemDTOs = orderItemRepository.findByOrderId(entity.getId()).stream().map(i -> {
-            String productName = productRepository.findById(i.getProductId()).map(ProductEntity::getName).orElse("");
+        List<OrderItemEntity> items = orderItemRepository.findByOrderId(entity.getId());
+        List<Long> productIds = items.stream().map(OrderItemEntity::getProductId).distinct().collect(Collectors.toList());
+        Map<Long, String> productNames = productRepository.findAllById(productIds).stream()
+                .collect(Collectors.toMap(ProductEntity::getId, ProductEntity::getName));
+
+        List<OrderItemDTO> itemDTOs = items.stream().map(i -> {
+            String productName = productNames.getOrDefault(i.getProductId(), "");
             return OrderItemDTO.builder()
                     .id(i.getId())
                     .orderId(i.getOrderId())
@@ -223,10 +229,24 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderItemDTO> getKdsItems(Long branchId) {
-        return orderItemRepository.findKdsItems(branchId).stream().map(i -> {
-            String productName = productRepository.findById(i.getProductId()).map(ProductEntity::getName).orElse("");
-            OrderEntity order = orderRepository.findById(i.getOrderId()).orElse(null);
-            String tableName = order != null ? tableRepository.findById(order.getTableId()).map(DiningTableEntity::getName).orElse("") : "";
+        List<OrderItemEntity> items = orderItemRepository.findKdsItems(branchId);
+        
+        List<Long> productIds = items.stream().map(OrderItemEntity::getProductId).distinct().collect(Collectors.toList());
+        Map<Long, String> productNames = productRepository.findAllById(productIds).stream()
+                .collect(Collectors.toMap(ProductEntity::getId, ProductEntity::getName));
+
+        List<Long> orderIds = items.stream().map(OrderItemEntity::getOrderId).distinct().collect(Collectors.toList());
+        Map<Long, OrderEntity> orders = orderRepository.findAllById(orderIds).stream()
+                .collect(Collectors.toMap(OrderEntity::getId, o -> o));
+
+        List<Long> tableIds = orders.values().stream().map(OrderEntity::getTableId).distinct().collect(Collectors.toList());
+        Map<Long, String> tableNames = tableRepository.findAllById(tableIds).stream()
+                .collect(Collectors.toMap(DiningTableEntity::getId, DiningTableEntity::getName));
+
+        return items.stream().map(i -> {
+            String productName = productNames.getOrDefault(i.getProductId(), "");
+            OrderEntity order = orders.get(i.getOrderId());
+            String tableName = (order != null) ? tableNames.getOrDefault(order.getTableId(), "") : "";
             return OrderItemDTO.builder()
                     .id(i.getId())
                     .orderId(i.getOrderId())

@@ -157,8 +157,8 @@ export default function KDSPage() {
           </div>
           <button 
             onClick={() => {
-              localStorage.removeItem('auth_token');
-              localStorage.removeItem('auth_user');
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
               window.location.href = '/login';
             }}
             className="btn-ghost !text-red-600 hover:!bg-red-50 !border-red-200 px-3 py-2"
