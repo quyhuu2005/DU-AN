@@ -31,8 +31,9 @@ export default function LoginPage() {
       const res = await authService.login({ username: form.username.trim(), password: form.password });
       authService.saveSession(res.token, res.user);
       // Role-based routing
-      if (res.user.role === 'BOSS')    navigate(ROUTES.DASHBOARD);
-      else if (res.user.role === 'MANAGER') navigate(ROUTES.DASHBOARD);
+      if (res.user.role === 'BOSS')         navigate(ROUTES.DASHBOARD);
+      else if (res.user.role === 'MANAGER')  navigate(ROUTES.DASHBOARD);
+      else if (res.user.role === 'CHEF')     navigate(ROUTES.KDS);
       else navigate(ROUTES.POS);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Lỗi không xác định';
@@ -182,6 +183,7 @@ export default function LoginPage() {
             <p><span className="font-medium">Boss</span> → Trang Admin</p>
             <p><span className="font-medium">Quản lý</span> → Dashboard chi nhánh</p>
             <p><span className="font-medium">Nhân viên</span> → Màn hình POS</p>
+            <p><span className="font-medium">Đầu bếp</span> → Màn hình Bếp (KDS)</p>
           </div>
         </div>
       </div>

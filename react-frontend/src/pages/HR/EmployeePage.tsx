@@ -23,7 +23,8 @@ export default function EmployeePage() {
   const [branchFilter, setBranchFilter] = useState('');
   
   const [page, setPage] = useState(0);
-  // const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState<Employee | null>(null);
@@ -42,7 +43,8 @@ export default function EmployeePage() {
       const bId = isBoss ? branchFilter : String(user?.branchId || '');
       const res = await employeeService.getAll(page, 10, search, roleFilter, bId);
       setEmployees(res.content);
-      // setTotalPages(res.totalPages);
+      setTotalPages(res.totalPages);
+      setTotalItems(res.totalElements);
     } catch {
       error('Không thể tải danh sách nhân viên');
     } finally {
@@ -126,6 +128,10 @@ export default function EmployeePage() {
     }
   };
 
+  const PAGE_SIZE = 10;
+  const start = page * PAGE_SIZE + 1;
+  const end   = Math.min((page + 1) * PAGE_SIZE, totalItems);
+
   return (
     <div>
       <Toasts />
@@ -170,32 +176,78 @@ export default function EmployeePage() {
             </tr>
           </thead>
           <tbody>
-            {loading ? <tr><td colSpan={isBoss ? 7 : 6} className="text-center py-10">Đang tải...</td></tr> : 
-             employees.map(emp => (
-              <tr key={emp.id}>
-                <td className="font-mono text-xs">#{emp.id}</td>
-                <td className="font-semibold">{emp.fullName}</td>
-                <td>{emp.username}</td>
-                <td>
-                  <span className="px-2 py-1 rounded text-xs" style={{ background: 'var(--color-surface-bright)' }}>{emp.role}</span>
-                </td>
-                {isBoss && <td>{emp.branchName || '—'}</td>}
-                <td>
-                  {emp.status === 'ACTIVE' ? <span className="badge-success">Hoạt động</span> : <span className="badge-inactive">Bị khóa</span>}
-                </td>
-                <td>
-                  <div className="flex justify-end gap-2">
-                    <button className="btn-icon" onClick={() => openEdit(emp)}><span className="material-symbols-outlined">edit</span></button>
-                    <button className="btn-icon" onClick={() => setConfirmTarget(emp)} style={{ color: emp.status === 'ACTIVE' ? 'var(--color-danger)' : 'var(--color-success)' }}>
-                      <span className="material-symbols-outlined">{emp.status === 'ACTIVE' ? 'lock' : 'lock_open'}</span>
-                    </button>
-                  </div>
+            {loading ? (
+              <tr>
+                <td colSpan={isBoss ? 7 : 6} className="text-center py-16" style={{ color: 'var(--color-text-secondary)' }}>
+                  <span className="material-symbols-outlined animate-spin text-3xl block mx-auto mb-2">progress_activity</span>
+                  Đang tải...
                 </td>
               </tr>
-            ))}
+            ) : employees.length === 0 ? (
+              <tr>
+                <td colSpan={isBoss ? 7 : 6} className="text-center py-16" style={{ color: 'var(--color-text-secondary)' }}>
+                  <span className="material-symbols-outlined text-4xl block mb-2">badge</span>
+                  Chưa có nhân viên nào
+                </td>
+              </tr>
+            ) : (
+              employees.map(emp => (
+                <tr key={emp.id}>
+                  <td className="font-mono text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                    #{emp.id}
+                  </td>
+                  <td className="font-semibold">{emp.fullName}</td>
+                  <td>{emp.username}</td>
+                  <td>
+                    <span className="px-2 py-1 rounded text-xs" style={{ background: 'var(--color-surface-bright)' }}>{emp.role}</span>
+                  </td>
+                  {isBoss && <td>{emp.branchName || '—'}</td>}
+                  <td>
+                    {emp.status === 'ACTIVE' ? (
+                      <span className="badge-success">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block mr-1" />
+                        Hoạt động
+                      </span>
+                    ) : (
+                      <span className="badge-inactive">Bị khóa</span>
+                    )}
+                  </td>
+                  <td>
+                    <div className="flex justify-end gap-2">
+                      <button className="btn-icon" onClick={() => openEdit(emp)}><span className="material-symbols-outlined">edit</span></button>
+                      <button className="btn-icon" onClick={() => setConfirmTarget(emp)} style={{ color: emp.status === 'ACTIVE' ? 'var(--color-danger)' : 'var(--color-success)' }}>
+                        <span className="material-symbols-outlined">{emp.status === 'ACTIVE' ? 'lock' : 'lock_open'}</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
+
+      {/* ── Pagination ── */}
+      {!loading && totalItems > 0 && (
+        <div className="flex items-center justify-between mt-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+          <span>Hiển thị {start}–{end} / {totalItems} nhân viên</span>
+          <div className="flex gap-1">
+            <button className="btn-ghost px-3 py-1.5 text-xs" onClick={() => setPage(p => p - 1)} disabled={page === 0}>
+              <span className="material-symbols-outlined text-base">chevron_left</span>
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium ${page === i ? 'btn-primary' : 'btn-ghost'}`}
+                onClick={() => setPage(i)}
+              >{i + 1}</button>
+            ))}
+            <button className="btn-ghost px-3 py-1.5 text-xs" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>
+              <span className="material-symbols-outlined text-base">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <Modal title={editTarget ? 'Sửa thông tin' : 'Thêm nhân viên'} onClose={() => setShowForm(false)}>

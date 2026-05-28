@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -20,4 +21,9 @@ public class OrderItemDTO {
     private BigDecimal price;
     private String note;
     private String status;
+    // KDS extra fields
+    private Long tableId;
+    private String tableName;
+    private LocalDateTime orderCreatedAt;
 }
+

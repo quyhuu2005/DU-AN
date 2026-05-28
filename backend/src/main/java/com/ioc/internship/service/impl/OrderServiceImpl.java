@@ -24,6 +24,9 @@ public class OrderServiceImpl implements OrderService {
     private final BranchMenuRepository branchMenuRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final ProductRecipeRepository productRecipeRepository;
+    private final InventoryItemRepository inventoryItemRepository;
+    private final InventoryTransactionRepository inventoryTransactionRepository;
 
     @Override
     @Transactional
@@ -67,6 +70,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDTO> getActiveOrdersByBranch(Long branchId) {
         return orderRepository.findByBranchIdAndStatus(branchId, "PENDING")
+                .stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderDTO> getCompletedOrdersByBranch(Long branchId) {
+        return orderRepository.findCompletedOrdersByBranch(branchId)
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
@@ -192,6 +201,9 @@ public class OrderServiceImpl implements OrderService {
                     .price(i.getPrice())
                     .note(i.getNote())
                     .status(i.getStatus())
+                    .tableId(entity.getTableId())
+                    .tableName(tableName)
+                    .orderCreatedAt(entity.getCreatedAt())
                     .build();
         }).collect(Collectors.toList());
 
@@ -206,6 +218,85 @@ public class OrderServiceImpl implements OrderService {
                 .status(entity.getStatus())
                 .createdAt(entity.getCreatedAt())
                 .items(itemDTOs)
+                .build();
+    }
+
+    @Override
+    public List<OrderItemDTO> getKdsItems(Long branchId) {
+        return orderItemRepository.findKdsItems(branchId).stream().map(i -> {
+            String productName = productRepository.findById(i.getProductId()).map(ProductEntity::getName).orElse("");
+            OrderEntity order = orderRepository.findById(i.getOrderId()).orElse(null);
+            String tableName = order != null ? tableRepository.findById(order.getTableId()).map(DiningTableEntity::getName).orElse("") : "";
+            return OrderItemDTO.builder()
+                    .id(i.getId())
+                    .orderId(i.getOrderId())
+                    .productId(i.getProductId())
+                    .productName(productName)
+                    .quantity(i.getQuantity())
+                    .price(i.getPrice())
+                    .note(i.getNote())
+                    .status(i.getStatus())
+                    .tableId(order != null ? order.getTableId() : null)
+                    .tableName(tableName)
+                    .orderCreatedAt(order != null ? order.getCreatedAt() : null)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public OrderItemDTO updateItemStatus(Long itemId, String status) {
+        OrderItemEntity item = orderItemRepository.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy món ăn"));
+        // Validate status transition
+        List<String> validStatuses = List.of("PENDING", "COOKING", "READY", "SERVED");
+        if (!validStatuses.contains(status)) {
+            throw new RuntimeException("Trạng thái không hợp lệ: " + status);
+        }
+        
+        // Auto-deduct inventory when item becomes READY
+        if ("READY".equals(status) && !"READY".equals(item.getStatus()) && !"SERVED".equals(item.getStatus())) {
+            OrderEntity order = orderRepository.findById(item.getOrderId()).orElseThrow();
+            List<ProductRecipeEntity> recipes = productRecipeRepository.findByProductId(item.getProductId());
+            for (ProductRecipeEntity recipe : recipes) {
+                InventoryItemEntity invItem = inventoryItemRepository.findByBranchIdOrderByNameAsc(order.getBranchId())
+                        .stream().filter(inv -> inv.getName().equalsIgnoreCase(recipe.getIngredientName()))
+                        .findFirst().orElse(null);
+                
+                if (invItem != null) {
+                    double deductAmount = recipe.getQuantityRequired() * item.getQuantity();
+                    invItem.setQuantity(invItem.getQuantity() - deductAmount);
+                    inventoryItemRepository.save(invItem);
+                    
+                    InventoryTransactionEntity tx = InventoryTransactionEntity.builder()
+                            .inventoryItemId(invItem.getId())
+                            .type("EXPORT")
+                            .quantity(deductAmount)
+                            .reason("Chế biến món: " + productRepository.findById(item.getProductId()).map(ProductEntity::getName).orElse(""))
+                            .createdAt(LocalDateTime.now())
+                            .build();
+                    inventoryTransactionRepository.save(tx);
+                }
+            }
+        }
+
+        item.setStatus(status);
+        OrderItemEntity saved = orderItemRepository.save(item);
+        String productName = productRepository.findById(saved.getProductId()).map(ProductEntity::getName).orElse("");
+        OrderEntity order = orderRepository.findById(saved.getOrderId()).orElse(null);
+        String tableName = order != null ? tableRepository.findById(order.getTableId()).map(DiningTableEntity::getName).orElse("") : "";
+        return OrderItemDTO.builder()
+                .id(saved.getId())
+                .orderId(saved.getOrderId())
+                .productId(saved.getProductId())
+                .productName(productName)
+                .quantity(saved.getQuantity())
+                .price(saved.getPrice())
+                .note(saved.getNote())
+                .status(saved.getStatus())
+                .tableId(order != null ? order.getTableId() : null)
+                .tableName(tableName)
+                .orderCreatedAt(order != null ? order.getCreatedAt() : null)
                 .build();
     }
 }

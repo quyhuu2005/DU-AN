@@ -1,6 +1,7 @@
 package com.ioc.internship.controller.admin;
 
 import com.ioc.internship.dto.OrderDTO;
+import com.ioc.internship.dto.OrderItemDTO;
 import com.ioc.internship.service.OrderService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -83,6 +84,39 @@ public class OrderController {
         }
     }
 
+    /** Lịch sử đơn hàng đã hoàn tất của chi nhánh */
+    @GetMapping("/branch/{branchId}/history")
+    public ResponseEntity<?> getOrderHistory(@PathVariable Long branchId) {
+        try {
+            List<OrderDTO> orders = orderService.getCompletedOrdersByBranch(branchId);
+            return ResponseEntity.ok(success(orders, ""));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(error(e.getMessage()));
+        }
+    }
+
+    /** KDS: Lấy danh sách món đang chờ chế biến tại chi nhánh */
+    @GetMapping("/branch/{branchId}/kds")
+    public ResponseEntity<?> getKdsItems(@PathVariable Long branchId) {
+        try {
+            List<OrderItemDTO> items = orderService.getKdsItems(branchId);
+            return ResponseEntity.ok(success(items, ""));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(error(e.getMessage()));
+        }
+    }
+
+    /** KDS: Cập nhật trạng thái chế biến của một món ăn */
+    @PatchMapping("/items/{itemId}/status")
+    public ResponseEntity<?> updateItemStatus(@PathVariable Long itemId, @RequestBody UpdateStatusReq req) {
+        try {
+            OrderItemDTO item = orderService.updateItemStatus(itemId, req.getStatus());
+            return ResponseEntity.ok(success(item, "Cập nhật trạng thái thành công"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(error(e.getMessage()));
+        }
+    }
+
     private Map<String, Object> success(Object data, String message) {
         Map<String, Object> res = new HashMap<>();
         res.put("success", true);
@@ -108,5 +142,10 @@ public class OrderController {
     @Data
     public static class UpdateQuantityReq {
         private Integer quantity;
+    }
+
+    @Data
+    public static class UpdateStatusReq {
+        private String status;
     }
 }

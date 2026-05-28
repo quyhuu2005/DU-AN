@@ -12,13 +12,17 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: ROUTES.DASHBOARD,  icon: 'dashboard',        label: 'Tổng quan' },
-  { to: ROUTES.BRANCHES,   icon: 'storefront',       label: 'Quản lý Chi nhánh', roles: ['BOSS'] },
-  { to: ROUTES.CATEGORIES, icon: 'category',         label: 'Danh mục',          roles: ['BOSS'] },
-  { to: ROUTES.MENU,       icon: 'restaurant_menu',  label: 'Thực đơn gốc',      roles: ['BOSS'] },
-  { to: ROUTES.EMPLOYEES,  icon: 'groups',           label: 'Quản lý Nhân sự',   roles: ['BOSS', 'MANAGER'] },
-  { to: ROUTES.BRANCH_MENU,icon: 'menu_book',        label: 'Thực đơn chi nhánh',roles: ['BOSS', 'MANAGER'] },
-  { to: ROUTES.TABLE_SETUP,icon: 'table_restaurant', label: 'Sơ đồ bàn',         roles: ['BOSS', 'MANAGER'] },
+  { to: ROUTES.DASHBOARD,     icon: 'dashboard',        label: 'Tổng quan' },
+  { to: ROUTES.BRANCHES,      icon: 'storefront',       label: 'Quản lý Chi nhánh',  roles: ['BOSS'] },
+  { to: ROUTES.CATEGORIES,    icon: 'category',         label: 'Danh mục',           roles: ['BOSS'] },
+  { to: ROUTES.MENU,          icon: 'restaurant_menu',  label: 'Thực đơn gốc',       roles: ['BOSS'] },
+  { to: ROUTES.EMPLOYEES,     icon: 'groups',           label: 'Quản lý Nhân sự',    roles: ['BOSS', 'MANAGER'] },
+  { to: ROUTES.BRANCH_MENU,   icon: 'menu_book',        label: 'Thực đơn chi nhánh', roles: ['BOSS', 'MANAGER'] },
+  { to: ROUTES.TABLE_SETUP,   icon: 'table_restaurant', label: 'Sơ đồ bàn',          roles: ['BOSS', 'MANAGER'] },
+  { to: ROUTES.INVENTORY,     icon: 'inventory_2',      label: 'Quản lý Kho',         roles: ['BOSS', 'MANAGER'] },
+  { to: ROUTES.REPORT_BRANCH, icon: 'bar_chart',        label: 'Doanh thu chi nhánh', roles: ['MANAGER'] },
+  { to: ROUTES.ORDER_HISTORY, icon: 'receipt_long',     label: 'Lịch sử đơn hàng',   roles: ['MANAGER'] },
+  { to: ROUTES.REPORT_SYSTEM, icon: 'donut_large',      label: 'Tổng hợp hệ thống',  roles: ['BOSS'] },
 ];
 
 export default function AdminLayout() {

@@ -82,18 +82,14 @@ export default function DashboardPage() {
     { icon: 'storefront',      label: 'Quản lý Chi nhánh',  href: '/admin/branches' },
     { icon: 'category',        label: 'Quản lý Danh mục',   href: '/admin/categories' },
     { icon: 'restaurant_menu', label: 'Thực đơn gốc',       href: '/admin/menu' },
-    { icon: 'group',           label: 'Nhân sự toàn hệ thống', href: '/admin/employees' },
-    { icon: 'bar_chart',       label: 'Báo cáo doanh thu',  href: '#' },
-    { icon: 'settings',        label: 'Cấu hình hệ thống',   href: '#' },
+    { icon: 'groups',          label: 'Quản lý Nhân sự',    href: '/admin/employees' },
   ];
 
   const managerActions = [
     { icon: 'menu_book',        label: 'Thực đơn chi nhánh', href: '/admin/branch-menu' },
     { icon: 'table_restaurant', label: 'Sơ đồ bàn',          href: '/admin/table-setup' },
     { icon: 'groups',           label: 'Nhân sự chi nhánh',  href: '/admin/employees' },
-    { icon: 'receipt_long',     label: 'Lịch sử đơn hàng',   href: '#' },
-    { icon: 'monitoring',       label: 'Báo cáo chi nhánh',  href: '#' },
-    { icon: 'edit_calendar',    label: 'Ca làm việc',        href: '#' },
+    { icon: 'bar_chart',        label: 'Báo cáo doanh thu',  href: '/admin/report/branch' },
   ];
 
   const actions = isBoss ? bossActions : managerActions;

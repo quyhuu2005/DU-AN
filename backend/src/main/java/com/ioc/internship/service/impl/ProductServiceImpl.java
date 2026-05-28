@@ -1,6 +1,10 @@
 package com.ioc.internship.service.impl;
 
+import com.ioc.internship.entity.BranchEntity;
+import com.ioc.internship.entity.BranchMenuEntity;
 import com.ioc.internship.entity.ProductEntity;
+import com.ioc.internship.repository.BranchMenuRepository;
+import com.ioc.internship.repository.BranchRepository;
 import com.ioc.internship.repository.ProductRepository;
 import com.ioc.internship.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +17,8 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final BranchRepository branchRepository;
+    private final BranchMenuRepository branchMenuRepository;
 
     @Override
     public List<ProductEntity> getAllProducts(String search, Long categoryId) {
@@ -30,7 +36,21 @@ public class ProductServiceImpl implements ProductService {
         if (product.getStatus() == null || product.getStatus().isBlank()) {
             product.setStatus("ACTIVE");
         }
-        return productRepository.save(product);
+        ProductEntity savedProduct = productRepository.save(product);
+
+        // Auto-assign this product to all branches
+        List<BranchEntity> branches = branchRepository.findAll();
+        for (BranchEntity branch : branches) {
+            BranchMenuEntity bm = new BranchMenuEntity();
+            bm.setBranchId(branch.getId());
+            bm.setProductId(savedProduct.getId());
+            bm.setLocalPrice(savedProduct.getBasePrice());
+            bm.setIsAvailable(true);
+            bm.setStatus("ACTIVE");
+            branchMenuRepository.save(bm);
+        }
+
+        return savedProduct;
     }
 
     @Override

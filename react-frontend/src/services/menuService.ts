@@ -13,6 +13,7 @@ export const menuService = {
       categoryId:  data.categoryId,
       basePrice:   data.basePrice,
       description: data.description,
+      imageUrl:    data.imageUrl ?? '',
     }),
 
   update: (id: number, data: Partial<MenuItemFormData>) =>

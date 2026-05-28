@@ -1,5 +1,6 @@
 // ── Auth ──────────────────────────────────────────────
-export type Role = 'BOSS' | 'MANAGER' | 'STAFF';
+export type Role = 'BOSS' | 'MANAGER' | 'STAFF' | 'CHEF';
+
 
 export interface LoginRequest {
   username: string;
@@ -61,7 +62,7 @@ export interface MenuItemFormData {
   categoryId: number;
   basePrice: number;
   description: string;
-  imageFile?: File;
+  imageUrl?: string;
 }
 
 // ── API Response wrapper ──────────────────────────────

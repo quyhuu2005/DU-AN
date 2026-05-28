@@ -7,12 +7,17 @@ interface Props {
   allowedRoles?: Role[];
 }
 
-/** Bảo vệ route: nếu chưa đăng nhập → /login. Nếu sai role → /admin */
+/** Bảo vệ route: nếu chưa đăng nhập → /login. Nếu sai role → trang phù hợp */
 export default function ProtectedRoute({ children, allowedRoles }: Props) {
-  const { isLoggedIn, hasRole } = useAuth();
+  const { isLoggedIn, hasRole, user } = useAuth();
 
   if (!isLoggedIn) return <Navigate to="/login" replace />;
-  if (allowedRoles && !hasRole(...allowedRoles)) return <Navigate to="/admin/dashboard" replace />;
+  if (allowedRoles && !hasRole(...allowedRoles)) {
+    // Chef goes to KDS, others go to admin dashboard
+    const fallback = user?.role === 'CHEF' ? '/kds' : '/admin/dashboard';
+    return <Navigate to={fallback} replace />;
+  }
 
   return <>{children}</>;
 }
+

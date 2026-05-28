@@ -1,0 +1,42 @@
+# Java / Maven build files
+backend/target/
+backend/bin/
+backend/*.jar
+backend/*.war
+backend/*.zip
+backend/*.tar.gz
+backend/*.rar
+backend/pom.xml.tag
+backend/pom.xml.releaseBackup
+backend/pom.xml.next
+backend/release.properties
+backend/dependency-reduced-pom.xml
+backend/buildNumber.properties
+backend/.mvn/timing.properties
+backend/.mvn/wrapper-snapshot-cache
+
+# Log files
+*.log
+backend/logs/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Frontend build files
+react-frontend/node_modules/
+react-frontend/dist/
+react-frontend/dist-ssr/
+react-frontend/*.local
+react-frontend/.env*.local
+
+# Temporary files
+tmp/
+temp/

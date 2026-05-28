@@ -10,10 +10,15 @@ public interface OrderService {
     OrderDTO getOrderById(Long id);
     OrderDTO getActiveOrderByTable(Long tableId);
     List<OrderDTO> getActiveOrdersByBranch(Long branchId);
+    List<OrderDTO> getCompletedOrdersByBranch(Long branchId);
     
     OrderDTO addItemToOrder(Long orderId, Long productId, Integer quantity, String note);
     OrderDTO updateItemQuantity(Long itemId, Integer quantity);
     OrderDTO removeItemFromOrder(Long itemId);
     
     OrderDTO checkoutOrder(Long orderId);
+
+    // KDS methods
+    List<OrderItemDTO> getKdsItems(Long branchId);
+    OrderItemDTO updateItemStatus(Long itemId, String status);
 }

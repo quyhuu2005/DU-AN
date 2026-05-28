@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { menuService } from '../../services/menuService';
+import { uploadService } from '../../services/uploadService';
 import { categoryService } from '../../services/categoryService';
 import type { MenuItem, MenuItemFormData, Category } from '../../types';
 import { formatCurrency } from '../../utils';
@@ -7,10 +8,12 @@ import Modal from '../../components/base/Modal';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
 import { useToast } from '../../hooks/useToast';
 
-const EMPTY_FORM: MenuItemFormData = { name: '', categoryId: 0, basePrice: 0, description: '' };
+const EMPTY_FORM: MenuItemFormData = { name: '', categoryId: 0, basePrice: 0, description: '', imageUrl: '' };
 
 export default function MasterMenuPage() {
   const { success, error, Toasts } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [items, setItems]       = useState<MenuItem[]>([]);
   const [cats, setCats]         = useState<Category[]>([]);
@@ -66,7 +69,7 @@ export default function MasterMenuPage() {
     setShowForm(true);
   };
   const openEdit = (m: MenuItem) => {
-    setForm({ name: m.name, categoryId: m.categoryId, basePrice: m.basePrice, description: m.description });
+    setForm({ name: m.name, categoryId: m.categoryId, basePrice: m.basePrice, description: m.description, imageUrl: m.imageUrl ?? '' });
     setFormErrors({});
     setEditTarget(m);
     setShowForm(true);
@@ -313,6 +316,87 @@ export default function MasterMenuPage() {
                 placeholder="Mô tả ngắn về món ăn..."
                 value={form.description}
                 onChange={(e) => onFormChange('description', e.target.value)} />
+            </div>
+
+            {/* Ảnh món ăn */}
+            <div>
+              <label className="label">Ảnh món ăn</label>
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploading(true);
+                  try {
+                    const url = await uploadService.uploadImage(file);
+                    onFormChange('imageUrl', url);
+                    success('Đã tải ảnh lên thành công');
+                  } catch (err: any) {
+                    error(err.message ?? 'Upload thất bại');
+                  } finally {
+                    setUploading(false);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                  }
+                }}
+              />
+
+              {form.imageUrl ? (
+                /* Preview */
+                <div className="relative w-full h-44 rounded-xl overflow-hidden border group"
+                  style={{ borderColor: 'var(--color-border)' }}>
+                  <img
+                    src={form.imageUrl}
+                    alt="preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white text-sm font-semibold"
+                      style={{ color: 'var(--color-primary)' }}
+                    >
+                      <span className="material-symbols-outlined text-base">upload</span>
+                      Đổi ảnh
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onFormChange('imageUrl', '')}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white text-sm font-semibold text-red-500"
+                    >
+                      <span className="material-symbols-outlined text-base">delete</span>
+                      Xóa
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Upload box */
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="w-full h-36 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors hover:border-primary/60 hover:bg-primary/[0.02] disabled:opacity-50"
+                  style={{ borderColor: 'var(--color-border)' }}
+                >
+                  {uploading ? (
+                    <>
+                      <span className="material-symbols-outlined text-3xl animate-spin" style={{ color: 'var(--color-primary)' }}>progress_activity</span>
+                      <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Đang tải ảnh...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-3xl" style={{ color: 'var(--color-primary)' }}>add_photo_alternate</span>
+                      <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Nhấn để chọn ảnh từ máy</span>
+                      <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>JPG, PNG, WEBP — tối đa 10MB</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
             {/* Auto-sync note */}

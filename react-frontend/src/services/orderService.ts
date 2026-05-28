@@ -46,4 +46,7 @@ export const orderService = {
     
   checkout: (orderId: number) =>
     http.post<ApiResponse<Order>>(`/orders/${orderId}/checkout`, {}),
+
+  getHistory: (branchId: number) =>
+    http.get<ApiResponse<Order[]>>(`/orders/branch/${branchId}/history`),
 };

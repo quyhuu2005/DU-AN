@@ -1,16 +1,21 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage      from './pages/Auth/LoginPage';
-import AdminLayout    from './layouts/AdminLayout';
-import DashboardPage  from './pages/Dashboard/DashboardPage';
-import BranchPage     from './pages/Branch/BranchPage';
-import CategoryPage   from './pages/Menu/CategoryPage';
-import MasterMenuPage from './pages/Menu/MasterMenuPage';
-import EmployeePage   from './pages/HR/EmployeePage';
-import BranchMenuPage from './pages/Branch/BranchMenuPage';
-import TableSetupPage from './pages/Branch/TableSetupPage';
-import POSPage        from './pages/POS/POSPage';
-import ProtectedRoute from './routes/ProtectedRoute';
-import { ROUTES }     from './constants';
+import LoginPage        from './pages/Auth/LoginPage';
+import AdminLayout      from './layouts/AdminLayout';
+import DashboardPage    from './pages/Dashboard/DashboardPage';
+import BranchPage       from './pages/Branch/BranchPage';
+import CategoryPage     from './pages/Menu/CategoryPage';
+import MasterMenuPage   from './pages/Menu/MasterMenuPage';
+import EmployeePage     from './pages/HR/EmployeePage';
+import BranchMenuPage   from './pages/Branch/BranchMenuPage';
+import TableSetupPage   from './pages/Branch/TableSetupPage';
+import POSPage          from './pages/POS/POSPage';
+import KDSPage          from './pages/KDS/KDSPage';
+import InventoryPage    from './pages/Inventory/InventoryPage';
+import BranchRevenuePage from './pages/Report/BranchRevenuePage';
+import SystemRevenuePage from './pages/Report/SystemRevenuePage';
+import OrderHistoryPage  from './pages/Report/OrderHistoryPage';
+import ProtectedRoute   from './routes/ProtectedRoute';
+import { ROUTES }       from './constants';
 
 function App() {
   return (
@@ -85,6 +90,43 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Sprint 4: Report routes */}
+          <Route
+            path="report/branch"
+            element={
+              <ProtectedRoute allowedRoles={['MANAGER', 'BOSS']}>
+                <BranchRevenuePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="report/system"
+            element={
+              <ProtectedRoute allowedRoles={['BOSS']}>
+                <SystemRevenuePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="order-history"
+            element={
+              <ProtectedRoute allowedRoles={['BOSS', 'MANAGER']}>
+                <OrderHistoryPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="inventory"
+            element={
+              <ProtectedRoute allowedRoles={['BOSS', 'MANAGER']}>
+                <InventoryPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* POS (Staff/Manager/Boss) */}
@@ -93,6 +135,16 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['STAFF', 'MANAGER', 'BOSS']}>
               <POSPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* KDS (Chef/Manager/Boss) */}
+        <Route
+          path="/kds"
+          element={
+            <ProtectedRoute allowedRoles={['CHEF', 'MANAGER', 'BOSS']}>
+              <KDSPage />
             </ProtectedRoute>
           }
         />

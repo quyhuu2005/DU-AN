@@ -34,6 +34,13 @@ export default function POSPage() {
   const [showOpenTable, setShowOpenTable] = useState(false);
   const [showQtyModal, setShowQtyModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'QR'>('CASH');
+
+  const openPaymentModal = () => {
+    setPaymentMethod('CASH');
+    setCashReceived(0);
+    setShowPaymentModal(true);
+  };
 
   useEffect(() => {
     if (!user?.branchId) return;
@@ -339,7 +346,7 @@ export default function POSPage() {
           </div>
           <button 
             disabled={!currentOrder || currentOrder.items.length === 0 || paying}
-            onClick={() => setShowPaymentModal(true)}
+            onClick={openPaymentModal}
             className="w-full bg-[#f97316] hover:bg-[#ea6c10] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg transition-all flex justify-center items-center gap-2 text-lg active:scale-[0.98]"
           >
             {paying ? (
@@ -402,45 +409,113 @@ export default function POSPage() {
       {/* 3. Thanh toán Modal */}
       {showPaymentModal && currentOrder && (
         <div className="modal-backdrop">
-          <div className="modal-box max-w-lg">
-            <h3 className="modal-title flex items-center gap-2">
+          <div className="modal-box max-w-xl">
+            <h3 className="modal-title flex items-center gap-2 mb-2">
               <span className="material-symbols-outlined">payments</span>
-              Xác nhận thanh toán
+              Thanh toán hóa đơn
             </h3>
-            <div className="space-y-4 my-6">
-              <div className="flex justify-between text-lg">
-                <span className="text-gray-500">Tổng tiền cần thu:</span>
-                <span className="font-extrabold text-2xl text-[#f97316]">{formatCurrency(currentOrder.totalPrice)}</span>
+            
+            {/* Phương thức thanh toán Tabs */}
+            <div className="flex bg-gray-100 p-1.5 rounded-xl mb-6">
+              <button 
+                className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all flex justify-center items-center gap-2 ${paymentMethod === 'CASH' ? 'bg-white shadow-sm text-[#f97316]' : 'text-gray-500 hover:text-gray-700'}`}
+                onClick={() => setPaymentMethod('CASH')}
+              >
+                <span className="material-symbols-outlined text-[20px]">payments</span> Tiền mặt
+              </button>
+              <button 
+                className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all flex justify-center items-center gap-2 ${paymentMethod === 'QR' ? 'bg-white shadow-sm text-[#f97316]' : 'text-gray-500 hover:text-gray-700'}`}
+                onClick={() => setPaymentMethod('QR')}
+              >
+                <span className="material-symbols-outlined text-[20px]">qr_code_scanner</span> Chuyển khoản QR
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-8">
+              <div className="flex justify-between items-center p-5 bg-orange-50 border border-orange-100 rounded-2xl">
+                <span className="text-orange-800 font-bold text-lg">Tổng cần thu:</span>
+                <span className="font-extrabold text-3xl text-[#f97316]">{formatCurrency(currentOrder.totalPrice)}</span>
               </div>
-              <div className="space-y-2">
-                <label className="label">Tiền khách đưa:</label>
-                <input 
-                  type="number" 
-                  className="input text-2xl font-bold py-4" 
-                  value={cashReceived || ''} 
-                  onChange={(e) => setCashReceived(Number(e.target.value))}
-                  placeholder="Nhập số tiền..."
-                  autoFocus
-                />
-              </div>
-              {cashReceived > 0 && (
-                <div className="flex justify-between p-4 bg-green-50 rounded-xl border border-green-100">
-                  <span className="text-green-700 font-bold text-lg">Tiền thối lại:</span>
-                  <span className="text-green-700 font-extrabold text-xl">
-                    {formatCurrency(Math.max(0, cashReceived - currentOrder.totalPrice))}
-                  </span>
+
+              {paymentMethod === 'CASH' ? (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="space-y-2">
+                    <label className="label">Tiền khách đưa:</label>
+                    <div className="relative">
+                      <span className="absolute left-5 top-1/2 -translate-y-1/2 font-bold text-gray-500">VNĐ</span>
+                      <input 
+                        type="number" 
+                        className="input text-3xl font-extrabold py-5 pl-16 text-right" 
+                        value={cashReceived || ''} 
+                        onChange={(e) => setCashReceived(Number(e.target.value))}
+                        placeholder="0"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                  {/* Gợi ý mệnh giá nhanh */}
+                  <div className="grid grid-cols-4 gap-2">
+                    {[currentOrder.totalPrice, 100000, 200000, 500000].map((amt, idx) => (
+                      <button 
+                        key={idx} 
+                        className="py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-orange-50 hover:border-orange-200 hover:text-[#f97316] transition-colors" 
+                        onClick={() => setCashReceived(amt)}
+                      >
+                        {idx === 0 ? 'Vừa đủ' : formatCurrency(amt).replace(' đ', '')}
+                      </button>
+                    ))}
+                  </div>
+                  {cashReceived > 0 && (
+                    <div className="flex justify-between items-center p-5 bg-green-50 rounded-2xl border border-green-200 mt-2">
+                      <span className="text-green-700 font-bold text-lg">Tiền thừa trả khách:</span>
+                      <span className="text-green-700 font-extrabold text-2xl">
+                        {formatCurrency(Math.max(0, cashReceived - currentOrder.totalPrice))}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center space-y-4 animate-fade-in py-2">
+                  <div className="relative p-3 bg-white rounded-3xl border-2 border-dashed border-[#f97316]">
+                    <img 
+                      src={`https://img.vietqr.io/image/970436-00000000000-compact2.png?amount=${currentOrder.totalPrice}&addInfo=ThanhToanDonHang${currentOrder.id}&accountName=RESTAURANT`} 
+                      alt="VietQR" 
+                      className="w-64 h-64 object-contain rounded-2xl"
+                    />
+                    {paying && (
+                      <div className="absolute inset-0 bg-white/80 rounded-3xl flex flex-col items-center justify-center backdrop-blur-sm z-10">
+                        <span className="material-symbols-outlined animate-spin text-[#f97316] text-5xl mb-2">progress_activity</span>
+                        <span className="font-bold text-[#f97316]">Đang xác nhận...</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <p className="font-bold text-gray-800 text-lg flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[#f97316] animate-pulse">radar</span>
+                      Đang chờ khách quét mã...
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">Hệ thống tự động in bill khi nhận được tiền</p>
+                  </div>
+                  
+                  {/* Nút giả lập để test */}
+                  <button onClick={handleCheckout} disabled={paying} className="px-4 py-2 mt-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                    [Dành cho Demo] Nhấn để giả lập quét mã thành công
+                  </button>
                 </div>
               )}
             </div>
+
             <div className="flex gap-3">
-              <button className="btn-ghost flex-1" onClick={() => setShowPaymentModal(false)}>Hủy</button>
-              <button 
-                className="btn-primary flex-1" 
-                disabled={cashReceived < currentOrder.totalPrice || paying}
-                onClick={handleCheckout}
-              >
-                {paying ? 'Đang xử lý...' : 'Xác nhận & In bill'}
-              </button>
+              <button className="btn-ghost flex-1 py-3 text-lg" onClick={() => setShowPaymentModal(false)}>Hủy bỏ</button>
+              {paymentMethod === 'CASH' && (
+                <button 
+                  className="btn-primary flex-1 py-3 text-lg" 
+                  disabled={cashReceived < currentOrder.totalPrice || paying}
+                  onClick={handleCheckout}
+                >
+                  {paying ? 'Đang xử lý...' : 'Xác nhận & In bill'}
+                </button>
+              )}
             </div>
           </div>
         </div>
