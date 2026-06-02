@@ -11,6 +11,7 @@ import TableSetupPage   from './pages/Branch/TableSetupPage';
 import POSPage          from './pages/POS/POSPage';
 import KDSPage          from './pages/KDS/KDSPage';
 import InventoryPage    from './pages/Inventory/InventoryPage';
+import ReservationPage  from './pages/Branch/ReservationPage';
 import BranchRevenuePage from './pages/Report/BranchRevenuePage';
 import SystemRevenuePage from './pages/Report/SystemRevenuePage';
 import OrderHistoryPage  from './pages/Report/OrderHistoryPage';
@@ -124,6 +125,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['BOSS', 'MANAGER']}>
                 <InventoryPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="reservations"
+            element={
+              <ProtectedRoute allowedRoles={['BOSS', 'MANAGER']}>
+                <ReservationPage />
               </ProtectedRoute>
             }
           />

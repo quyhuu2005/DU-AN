@@ -26,8 +26,11 @@ export interface Order {
 }
 
 export const orderService = {
-  createOrder: (branchId: number, tableId: number, staffId: number) =>
-    http.post<ApiResponse<Order>>(`/orders/branch/${branchId}/table/${tableId}/staff/${staffId}`, {}),
+  createOrder: (branchId: number, tableId: number, staffId: number, reservationId?: number) => {
+    let url = `/orders/branch/${branchId}/table/${tableId}/staff/${staffId}`;
+    if (reservationId) url += `?reservationId=${reservationId}`;
+    return http.post<ApiResponse<Order>>(url, {});
+  },
     
   getActiveOrderByTable: (tableId: number) =>
     http.get<ApiResponse<Order | null>>(`/orders/table/${tableId}/active`),
@@ -46,6 +49,9 @@ export const orderService = {
     
   checkout: (orderId: number) =>
     http.post<ApiResponse<Order>>(`/orders/${orderId}/checkout`, {}),
+
+  cancelOrder: (orderId: number) =>
+    http.delete<ApiResponse<null>>(`/orders/${orderId}`),
 
   getHistory: (branchId: number) =>
     http.get<ApiResponse<Order[]>>(`/orders/branch/${branchId}/history`),

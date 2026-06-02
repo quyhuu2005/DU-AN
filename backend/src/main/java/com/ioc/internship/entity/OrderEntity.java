@@ -29,6 +29,9 @@ public class OrderEntity {
     @Column(name = "staff_id")
     private Long staffId;
 
+    @Column(name = "reservation_id")
+    private Long reservationId; // linked reservation if order was opened from a RESERVED table
+
     @Column(name = "total_price")
     private BigDecimal totalPrice;
 

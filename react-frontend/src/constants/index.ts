@@ -12,6 +12,7 @@ export const ROUTES = {
   TABLE_SETUP:   '/admin/table-setup',
   REPORT_BRANCH: '/admin/report/branch',
   REPORT_SYSTEM: '/admin/report/system',
+  RESERVATIONS:  '/admin/reservations',
   ORDER_HISTORY: '/admin/order-history',
   INVENTORY:     '/admin/inventory',
   POS:           '/pos',

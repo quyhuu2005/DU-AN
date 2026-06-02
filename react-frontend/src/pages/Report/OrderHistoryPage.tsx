@@ -34,6 +34,15 @@ export default function OrderHistoryPage() {
   // date range filter (today | week | month | all)
   const [period, setPeriod] = useState<'today' | 'week' | 'month' | 'all'>('all');
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, period]);
+
   const fetchOrders = useCallback(async () => {
     if (!branchId) return;
     setLoading(true);
@@ -85,6 +94,10 @@ export default function OrderHistoryPage() {
     { value: 'week',  label: '7 ngày' },
     { value: 'month', label: 'Tháng này' },
   ] as const;
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedOrders = filtered.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div>
@@ -205,7 +218,7 @@ export default function OrderHistoryPage() {
                       </td>
                     </tr>
                   )
-                : filtered.map((order) => {
+                : paginatedOrders.map((order) => {
                     const st = STATUS_LABEL[order.status] ?? STATUS_LABEL.COMPLETED;
                     const isExpanded = expandedId === order.id;
                     return (
@@ -310,13 +323,79 @@ export default function OrderHistoryPage() {
         </div>
 
         {!loading && filtered.length > 0 && (
-          <div className="mt-4 px-2 flex items-center justify-between">
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              Hiển thị <strong>{filtered.length}</strong> đơn hàng
-            </p>
-            <p className="text-sm font-semibold" style={{ color: 'var(--color-primary)' }}>
-              Tổng: {formatCurrency(totalRevenue)}
-            </p>
+          <div className="mt-4 px-2 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
+            <div className="flex items-center gap-2">
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                Hiển thị {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filtered.length)} trên tổng số <strong>{filtered.length}</strong> đơn hàng
+              </p>
+              <span className="text-gray-300">|</span>
+              <p className="text-sm font-semibold" style={{ color: 'var(--color-primary)' }}>
+                Tổng tiền: {formatCurrency(totalRevenue)}
+              </p>
+            </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button
+                  className="w-8 h-8 rounded border flex items-center justify-center transition-colors disabled:opacity-50"
+                  style={{ borderColor: 'var(--color-border)' }}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <span className="material-symbols-outlined text-sm">chevron_left</span>
+                </button>
+                
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const p = i + 1;
+                  // Simple logic to show max 5 pages around current
+                  if (totalPages > 7 && (p < currentPage - 2 || p > currentPage + 2)) {
+                    if (p === 1 || p === totalPages) {
+                      return (
+                        <button
+                          key={p}
+                          className="w-8 h-8 rounded border text-sm font-medium transition-colors"
+                          style={{ borderColor: 'var(--color-border)' }}
+                          onClick={() => setCurrentPage(p)}
+                        >
+                          {p}
+                        </button>
+                      );
+                    }
+                    if (p === currentPage - 3 || p === currentPage + 3) {
+                      return <span key={p} className="px-1 text-gray-400">...</span>;
+                    }
+                    return null;
+                  }
+                  
+                  return (
+                    <button
+                      key={p}
+                      className="w-8 h-8 rounded border text-sm font-medium transition-colors"
+                      style={currentPage === p ? {
+                        background: 'var(--color-primary)',
+                        color: '#fff',
+                        borderColor: 'var(--color-primary)',
+                      } : {
+                        borderColor: 'var(--color-border)',
+                      }}
+                      onClick={() => setCurrentPage(p)}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+
+                <button
+                  className="w-8 h-8 rounded border flex items-center justify-center transition-colors disabled:opacity-50"
+                  style={{ borderColor: 'var(--color-border)' }}
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <span className="material-symbols-outlined text-sm">chevron_right</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

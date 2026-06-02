@@ -71,7 +71,7 @@ public class OrderServiceImplTest {
         when(userRepository.findById(any())).thenReturn(Optional.empty());
 
         // Act
-        OrderDTO result = orderService.createOrder(1L, 1L, 2L);
+        OrderDTO result = orderService.createOrder(1L, 1L, 2L, null);
 
         // Assert
         assertNotNull(result);
@@ -90,7 +90,7 @@ public class OrderServiceImplTest {
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            orderService.createOrder(1L, 1L, 2L);
+            orderService.createOrder(1L, 1L, 2L, null);
         });
 
         assertEquals("Bàn này đang có đơn hàng chưa thanh toán.", exception.getMessage());

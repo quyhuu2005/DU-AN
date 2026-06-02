@@ -20,6 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: ROUTES.BRANCH_MENU,   icon: 'menu_book',        label: 'Thực đơn chi nhánh', roles: ['BOSS', 'MANAGER'] },
   { to: ROUTES.TABLE_SETUP,   icon: 'table_restaurant', label: 'Sơ đồ bàn',          roles: ['BOSS', 'MANAGER'] },
   { to: ROUTES.INVENTORY,     icon: 'inventory_2',      label: 'Quản lý Kho',         roles: ['BOSS', 'MANAGER'] },
+  { to: ROUTES.RESERVATIONS,  icon: 'book_online',      label: 'Quản lý Đặt bàn',     roles: ['MANAGER'] },
   { to: ROUTES.REPORT_BRANCH, icon: 'bar_chart',        label: 'Doanh thu chi nhánh', roles: ['MANAGER'] },
   { to: ROUTES.ORDER_HISTORY, icon: 'receipt_long',     label: 'Lịch sử đơn hàng',   roles: ['MANAGER'] },
   { to: ROUTES.REPORT_SYSTEM, icon: 'donut_large',      label: 'Tổng hợp hệ thống',  roles: ['BOSS'] },
@@ -29,6 +30,15 @@ export default function AdminLayout() {
   const { user, logout, hasRole } = useAuth();
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  // Mock notifications
+  const [notifications] = useState([
+    { id: 1, title: 'Sắp hết nguyên liệu', message: 'Thịt bò Mỹ (Kho Q1) chỉ còn 1kg.', time: '10 phút trước', isRead: false },
+    { id: 2, title: 'Khách đặt bàn mới', message: 'Bàn số 5 - Nguyễn Văn A - 19:00', time: '1 giờ trước', isRead: true },
+    { id: 3, title: 'Hủy đơn hàng', message: 'Nhân viên A vừa hủy 1 đơn hàng ở Bàn 2.', time: '2 giờ trước', isRead: true }
+  ]);
+  const unreadCount = notifications.filter(n => !n.isRead).length;
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const visibleNav = NAV_ITEMS.filter(
@@ -130,9 +140,46 @@ export default function AdminLayout() {
             <span>ProPOS</span>
           </div>
           <div className="flex items-center gap-1">
-            <button className="btn-icon">
-              <span className="material-symbols-outlined text-xl">notifications</span>
-            </button>
+            <div className="relative">
+              <button 
+                className="btn-icon relative" 
+                onClick={() => setShowNotifications(!showNotifications)}
+              >
+                <span className="material-symbols-outlined text-xl">notifications</span>
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500"></span>
+                )}
+              </button>
+
+              {/* Notification Dropdown */}
+              {showNotifications && (
+                <div 
+                  className="absolute right-0 mt-2 w-80 rounded-xl shadow-lg border overflow-hidden z-50 flex flex-col"
+                  style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', maxHeight: '400px' }}
+                >
+                  <div className="p-3 border-b flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }}>
+                    <h3 className="font-semibold text-sm">Thông báo</h3>
+                    <button className="text-xs text-blue-500 hover:underline">Đánh dấu đã đọc</button>
+                  </div>
+                  <div className="overflow-y-auto flex-1">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-sm text-gray-500">Không có thông báo nào</div>
+                    ) : (
+                      notifications.map(n => (
+                        <div key={n.id} className={`p-3 border-b hover:bg-gray-50 cursor-pointer transition-colors ${!n.isRead ? 'bg-blue-50/30' : ''}`} style={{ borderColor: 'var(--color-border)' }}>
+                          <h4 className={`text-sm ${!n.isRead ? 'font-semibold' : 'font-medium'}`}>{n.title}</h4>
+                          <p className="text-xs text-gray-600 mt-0.5">{n.message}</p>
+                          <span className="text-[10px] text-gray-400 mt-1 block">{n.time}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="p-2 border-t text-center" style={{ borderColor: 'var(--color-border)' }}>
+                    <button className="text-xs font-medium text-blue-500 hover:underline">Xem tất cả</button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

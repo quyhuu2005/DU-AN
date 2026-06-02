@@ -28,10 +28,11 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRecipeRepository productRecipeRepository;
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryTransactionRepository inventoryTransactionRepository;
+    private final ReservationRepository reservationRepository;
 
     @Override
     @Transactional
-    public OrderDTO createOrder(Long branchId, Long tableId, Long staffId) {
+    public OrderDTO createOrder(Long branchId, Long tableId, Long staffId, Long reservationId) {
         // Check if table is already occupied
         if (orderRepository.findByTableIdAndStatus(tableId, "PENDING").isPresent()) {
             throw new RuntimeException("Bàn này đang có đơn hàng chưa thanh toán.");
@@ -41,6 +42,7 @@ public class OrderServiceImpl implements OrderService {
                 .branchId(branchId)
                 .tableId(tableId)
                 .staffId(staffId)
+                .reservationId(reservationId)
                 .status("PENDING")
                 .totalPrice(BigDecimal.ZERO)
                 .createdAt(LocalDateTime.now())
@@ -50,6 +52,14 @@ public class OrderServiceImpl implements OrderService {
 
         // Update table status
         DiningTableEntity table = tableRepository.findById(tableId).orElseThrow();
+        
+        if (reservationId != null) {
+            reservationRepository.findById(reservationId).ifPresent(r -> {
+                r.setStatus("SEATED");
+                reservationRepository.save(r);
+            });
+        }
+        
         table.setStatus("OCCUPIED");
         tableRepository.save(table);
 
@@ -170,12 +180,40 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus("COMPLETED");
         orderRepository.save(order);
 
-        // Update table status back to EMPTY
         DiningTableEntity table = tableRepository.findById(order.getTableId()).orElseThrow();
-        table.setStatus("EMPTY");
-        tableRepository.save(table);
+        recalculateTableStatus(table, order.getBranchId());
 
         return toDTO(order);
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        OrderEntity order = orderRepository.findById(orderId).orElseThrow();
+        if ("COMPLETED".equals(order.getStatus())) {
+            throw new RuntimeException("Đơn hàng đã thanh toán không thể hủy.");
+        }
+
+        order.setStatus("CANCELLED");
+        orderRepository.save(order);
+
+        DiningTableEntity table = tableRepository.findById(order.getTableId()).orElseThrow();
+        recalculateTableStatus(table, order.getBranchId());
+    }
+
+    private void recalculateTableStatus(DiningTableEntity table, Long branchId) {
+        // Check if there are upcoming reservations for this table
+        LocalDateTime now = LocalDateTime.now();
+        List<Reservation> upcoming = reservationRepository.findOverlappingReservations(branchId, now, now.plusHours(2));
+        boolean hasUpcomingForTable = upcoming.stream()
+                .anyMatch(r -> table.getId().equals(r.getTableId()) && "CONFIRMED".equals(r.getStatus()));
+
+        if (hasUpcomingForTable) {
+            table.setStatus("RESERVED");
+        } else {
+            table.setStatus("EMPTY");
+        }
+        tableRepository.save(table);
     }
 
     private void updateOrderTotal(OrderEntity order) {

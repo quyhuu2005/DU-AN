@@ -20,9 +20,13 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/branch/{branchId}/table/{tableId}/staff/{staffId}")
-    public ResponseEntity<?> createOrder(@PathVariable Long branchId, @PathVariable Long tableId, @PathVariable Long staffId) {
+    public ResponseEntity<?> createOrder(
+            @PathVariable Long branchId, 
+            @PathVariable Long tableId, 
+            @PathVariable Long staffId,
+            @RequestParam(required = false) Long reservationId) {
         try {
-            OrderDTO order = orderService.createOrder(branchId, tableId, staffId);
+            OrderDTO order = orderService.createOrder(branchId, tableId, staffId, reservationId);
             return ResponseEntity.ok(success(order, "Đã mở bàn thành công"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(error(e.getMessage()));
@@ -79,6 +83,16 @@ public class OrderController {
         try {
             OrderDTO order = orderService.checkoutOrder(orderId);
             return ResponseEntity.ok(success(order, "Thanh toán thành công"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(error(e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<?> cancelOrder(@PathVariable Long orderId) {
+        try {
+            orderService.cancelOrder(orderId);
+            return ResponseEntity.ok(success(null, "Hủy đơn hàng thành công"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(error(e.getMessage()));
         }

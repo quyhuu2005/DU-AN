@@ -6,7 +6,7 @@ import com.ioc.internship.dto.OrderItemDTO;
 import java.util.List;
 
 public interface OrderService {
-    OrderDTO createOrder(Long branchId, Long tableId, Long staffId);
+    OrderDTO createOrder(Long branchId, Long tableId, Long staffId, Long reservationId);
     OrderDTO getOrderById(Long id);
     OrderDTO getActiveOrderByTable(Long tableId);
     List<OrderDTO> getActiveOrdersByBranch(Long branchId);
@@ -17,6 +17,7 @@ public interface OrderService {
     OrderDTO removeItemFromOrder(Long itemId);
     
     OrderDTO checkoutOrder(Long orderId);
+    void cancelOrder(Long orderId);
 
     // KDS methods
     List<OrderItemDTO> getKdsItems(Long branchId);

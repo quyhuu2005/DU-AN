@@ -15,6 +15,7 @@ GO
 IF OBJECT_ID('product_recipes', 'U') IS NOT NULL DROP TABLE product_recipes;
 IF OBJECT_ID('inventory_transactions', 'U') IS NOT NULL DROP TABLE inventory_transactions;
 IF OBJECT_ID('inventory_items', 'U') IS NOT NULL DROP TABLE inventory_items;
+IF OBJECT_ID('reservations', 'U') IS NOT NULL DROP TABLE reservations;
 IF OBJECT_ID('order_items', 'U') IS NOT NULL DROP TABLE order_items;
 IF OBJECT_ID('orders', 'U') IS NOT NULL DROP TABLE orders;
 IF OBJECT_ID('branch_menus', 'U') IS NOT NULL DROP TABLE branch_menus;
@@ -96,6 +97,26 @@ CREATE TABLE dining_tables (
     capacity INT DEFAULT 4,
     status VARCHAR(20) DEFAULT 'EMPTY', -- EMPTY, OCCUPIED, RESERVED
     CONSTRAINT fk_table_branch FOREIGN KEY (branch_id) REFERENCES branches(id)
+);
+GO
+
+-- 6.5. Bảng Đặt Bàn (Reservations)
+CREATE TABLE reservations (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    branch_id BIGINT NOT NULL,
+    table_id BIGINT NULL,
+    customer_name NVARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(20) NOT NULL,
+    party_size INT NOT NULL,
+    reserved_at DATETIME NOT NULL,
+    duration_minutes INT DEFAULT 90,
+    status VARCHAR(20) DEFAULT 'PENDING', -- PENDING, CONFIRMED, SEATED, CANCELLED, NO_SHOW
+    note NVARCHAR(MAX),
+    created_by BIGINT,
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT fk_res_branch FOREIGN KEY (branch_id) REFERENCES branches(id),
+    CONSTRAINT fk_res_table FOREIGN KEY (table_id) REFERENCES dining_tables(id),
+    CONSTRAINT fk_res_user FOREIGN KEY (created_by) REFERENCES users(id)
 );
 GO
 

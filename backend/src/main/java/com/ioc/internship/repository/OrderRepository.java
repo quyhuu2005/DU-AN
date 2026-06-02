@@ -15,6 +15,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     List<OrderEntity> findByBranchId(Long branchId);
     Optional<OrderEntity> findByTableIdAndStatus(Long tableId, String status);
     List<OrderEntity> findByBranchIdAndStatus(Long branchId, String status);
+    List<OrderEntity> findByBranchIdAndStatusIn(Long branchId, List<String> statuses);
 
     // Revenue queries for reporting
     @Query("SELECT o FROM OrderEntity o WHERE o.branchId = :branchId " +

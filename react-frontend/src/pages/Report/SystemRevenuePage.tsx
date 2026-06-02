@@ -201,14 +201,14 @@ export default function SystemRevenuePage() {
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
+              <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                 <Pie
                   data={pieData}
                   dataKey="revenue"
                   nameKey="branchName"
                   cx="50%"
-                  cy="48%"
-                  outerRadius={100}
+                  cy="50%"
+                  outerRadius={90}
                   innerRadius={50}
                   paddingAngle={3}
                   label={(props: any) => `${(props.percentage as number).toFixed(1)}%`}
